@@ -16,7 +16,9 @@ INSERT INTO STUDENT VALUES
 (102, 'Firoz A. S.','090200107090',' BCY-3', 3, '1994-05-03', 'Firoz.me@gmail.com', '8885999922'),
 (103, 'Krunal Vyas', '090243107101', 'BCZ-5', 5, '1984-03-01', 'Krunal.vyas@gmail.com' ,'9990888877'),
 (104, 'Vijay Patel' ,'090200107102', 'BCX-5', 5, '1985-02-15' ,'Vijay.patel123@gmail.com' ,'8787878787'),
-(105, 'Maulik Trivedi', '090200107103', 'BCY-3' ,3 ,'1988-01-20', 'Maulik123@gmail.com' ,'8789564512')--1. Display all the records of Student table.
+(105, 'Maulik Trivedi', '090200107103', 'BCY-3' ,3 ,'1988-01-20', 'Maulik123@gmail.com' ,'8789564512')
+
+--1. Display all the records of Student table.
 SELECT * FROM STUDENT
 
 
@@ -25,7 +27,7 @@ SELECT Name, EnrollmentNo,Division FROM STUDENT
 WHERE Sem=3
 
 
---3. Display the Name & ID of student and label the columns as ìStudent Nameî and ìStudent IDî.
+--3. Display the Name & ID of student and label the columns as ‚ÄúStudent Name‚Äù and ‚ÄúStudent ID‚Äù.
 SELECT Name AS [STUDENT NAME],StuID AS [STUDENT ID] FROM STUDENT
 
 
@@ -48,7 +50,7 @@ WHERE Sem=5 OR SEM=3
 SELECT Name,StuID FROM STUDENT
 WHERE Division NOT IN('BCY-3','BCX-3')
 
---8. Display all the students whose name starts with ìvî.
+--8. Display all the students whose name starts with ‚Äúv‚Äù.
 SELECT Name FROM STUDENT
 WHERE NAME LIKE 'V%'
 
@@ -80,7 +82,7 @@ WHERE BirthDate BETWEEN '1984' AND '1990'
 SELECT * FROM STUDENT
 WHERE EnrollmentNo IS NULL
 
---16. Retrieve all the students name and semester whose email id contain ì123î.
+--16. Retrieve all the students name and semester whose email id contain ‚Äú123‚Äù.
 SELECT * FROM STUDENT
 WHERE Email LIKE '%123%'
 
@@ -96,11 +98,44 @@ ORDER BY Name DESC
 SELECT * INTO Student_New FROM STUDENT
 SELECT * FROM Student_New
 
---20. Insert a new row in Student_New table: (106, ìChirag Patelî, 090200107104, ìBCY-5î, 5, 1987-03-23,
---ìchirag_s@gmail.comî, 7788998893)
+--20. Insert a new row in Student_New table: (106, ‚ÄúChirag Patel‚Äù, 090200107104, ‚ÄúBCY-5‚Äù, 5, 1987-03-23,
+--‚Äúchirag_s@gmail.com‚Äù, 7788998893)
 INSERT INTO Student_New VALUES
 (106, 'Chirag Patel','090200107104', 'BCY-5', 5, '1987-03-23','chirag_s@gmail.com', '7788998893')
 SELECT * FROM Student_New
 
 
+
 --EXTRA
+--DISPLY OLDEST STUDENT
+SELECT TOP 1 * FROM STUDENT
+ORDER BY BirthDate
+
+--DISPLAY YOUGEST STUDENT
+SELECT TOP 1 * FROM STUDENT
+ORDER BY BirthDate DESC
+
+--ENROLLMENT NUMBER DOES NOT START WITH '09'
+SELECT * FROM STUDENT
+WHERE EnrollmentNo NOT LIKE '09%'
+
+--TOP 3 STUDENT BASED ON EARLIEST BIRTHDATES
+SELECT TOP 3 * FROM STUDENT
+ORDER BY BirthDate
+
+--DISPLAY STUDENT WHOSE EMAIL IS NULL,EMPTY OR MISSING
+SELECT * FROM STUDENT
+WHERE Email IS NULL
+
+--DISPLAY STUDENT BORN IN FEBRUARY OR MARCH,REGARDLESS OF YEAR
+SELECT * FROM STUDENT
+WHERE MONTH(BirthDate) IN ('02','03')
+
+--NAME CONTAINS TWO WORDS AND SECOND WORD STARTS WITH 'P'
+SELECT * FROM STUDENT
+WHERE NAME LIKE '%_[P]%'
+
+--DISPLAY ALL STUDENTS WHOSE EMAILID CONTAINS THEIR FIRST NAME
+SELECT * FROM STUDENT
+WHERE Email LIKE '%'+
+SUBSTRING(NAME,1,CHARINDEX(' ',NAME+' ')-1)+'%'
