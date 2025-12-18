@@ -359,6 +359,113 @@ DROP COLUMN City;
 DROP TABLE EmpMaster;
 
 
+--LAB 4--
+
+--1. Find all persons with their department name & code.  
+SELECT p.PersonName, d.DepartmentName, d.DepartmentCode
+FROM Person p
+INNER JOIN Department d
+ON p.DepartmentID = d.DepartmentID;
+
+--2. Give department wise maximum & minimum salary with department name. 
+SELECT d.DepartmentName,
+       MAX(p.Salary) AS MaxSalary,
+       MIN(p.Salary) AS MinSalary
+FROM Person p
+INNER JOIN Department d
+ON p.DepartmentID = d.DepartmentID
+GROUP BY d.DepartmentName;
+
+--3. Find all departments whose total salary is exceeding 100000. 
+SELECT d.DepartmentName, SUM(p.Salary) AS TotalSalary
+FROM Person p
+INNER JOIN Department d
+ON p.DepartmentID = d.DepartmentID
+GROUP BY d.DepartmentName
+HAVING SUM(p.Salary) > 100000;
+
+--4. Retrieve person name, salary & department name who belongs to Jamnagar city.
+SELECT p.PersonName, p.Salary, d.DepartmentName
+FROM Person p
+INNER JOIN Department d
+ON p.DepartmentID = d.DepartmentID
+WHERE p.City = 'Jamnagar';
+
+--5. Find all persons who does not belongs to any department. 
+SELECT PersonName, Salary
+FROM Person
+WHERE DepartmentID IS NULL;
+
+--6. Find department wise person counts.
+SELECT d.DepartmentName, COUNT(p.PersonID) AS TotalPersons
+FROM Department d
+LEFT JOIN Person p
+ON d.DepartmentID = p.DepartmentID
+GROUP BY d.DepartmentName;
+
+--7. Find average salary of person who belongs to Ahmedabad city. 
+SELECT AVG(Salary) AS AvgSalary
+FROM Person
+WHERE City = 'Ahmedabad';
+
+--8. Produce Output Like: <PersonName> earns <Salary> from department <DepartmentName> monthly (In Single Column).
+SELECT 
+p.PersonName + ' earns ' + 
+CAST(p.Salary AS VARCHAR) + 
+' from department ' + 
+d.DepartmentName + 
+' monthly' AS Output
+FROM Person p
+INNER JOIN Department d
+ON p.DepartmentID = d.DepartmentID;
+
+--9. List all departments who have no persons. 
+SELECT d.DepartmentName
+FROM Department d
+LEFT JOIN Person p
+ON d.DepartmentID = p.DepartmentID
+WHERE p.PersonID IS NULL;
+
+--10. Find city & department wise total, average & maximum salaries.
+SELECT p.City, d.DepartmentName,
+       SUM(p.Salary) AS TotalSalary,
+       AVG(p.Salary) AS AvgSalary,
+       MAX(p.Salary) AS MaxSalary
+FROM Person p
+INNER JOIN Department d
+ON p.DepartmentID = d.DepartmentID
+GROUP BY p.City, d.DepartmentName;
+
+--11. Display Unique city names. 
+SELECT DISTINCT City
+FROM Person;
+
+--12. List out department names in which more than two persons. 
+SELECT d.DepartmentName
+FROM Person p
+INNER JOIN Department d
+ON p.DepartmentID = d.DepartmentID
+GROUP BY d.DepartmentName
+HAVING COUNT(p.PersonID) > 2;
+
+--13. Combine person name’s first three characters with city name’s last three characters in single column.
+SELECT 
+SUBSTRING(PersonName, 1, 3) + SUBSTRING(City, LEN(City)-2, 3) AS CombinedValue
+FROM Person;
+
+--14. Give 10% increment in Computer department employee’s salary. 
+UPDATE Person
+SET Salary = Salary + (Salary * 0.10)
+WHERE DepartmentID = (
+    SELECT DepartmentID 
+    FROM Department 
+    WHERE DepartmentName = 'Computer'
+);
+
+--15. Display all the person name’s who’s joining dates difference with current date is more than 365 days. 
+SELECT PersonName
+FROM Person
+WHERE DATEDIFF(day, JoiningDate, GETDATE()) > 365;
 
 
 
