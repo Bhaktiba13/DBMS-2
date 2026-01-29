@@ -1,0 +1,216 @@
+		----------LAB 6----------
+
+		----PART–A------
+
+CREATE TABLE Country (
+    Country_ID INT PRIMARY KEY,
+    Country_Name VARCHAR(100) NOT NULL UNIQUE,
+    Population INT NOT NULL,
+    Area_sq_km FLOAT NOT NULL,
+    Capital VARCHAR(100) NOT NULL,
+    Currency VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE State (
+    State_ID INT PRIMARY KEY,
+    State_Name VARCHAR(100) NOT NULL UNIQUE,
+    Population INT NOT NULL,
+    Area_sq_km FLOAT NOT NULL,
+    Capital VARCHAR(100) NOT NULL,
+    Country_ID INT NULL,
+    CONSTRAINT FK_State_Country
+        FOREIGN KEY (Country_ID) REFERENCES Country(Country_ID)
+);
+
+
+INSERT INTO Country VALUES
+(1, 'USA', 331002651, 9833520, 'Washington, D.C.', 'USD'),
+(2, 'CANADA', 38005238, 9984670, 'Ottawa', 'CAD'),
+(3, 'BRAZIL', 212559417, 8515767, 'Brasília', 'BRL'),
+(4, 'INDIA', 1380004385, 3287263, 'New Delhi', 'INR'),
+(5, 'RUSSIA', 145934462, 17098246, 'Moscow', 'RUB'),
+(6, 'CHINA', 1439323776, 9706961, 'Beijing', 'CNY'),
+(7, 'AUSTRALIA', 25499881, 7692024, 'Canberra', 'AUD'),
+(8, 'ARGENTINA', 45195777, 2780400, 'Buenos Aires', 'ARS'),
+(9, 'GERMANY', 83783942, 357022, 'Berlin', 'EUR'),
+(10, 'SOUTH AFRICA', 59308690, 1221037, 'Pretoria', 'ZAR');
+
+INSERT INTO State VALUES
+(1, 'California', 39538223, 423972, 'Sacramento', 1),
+(2, 'Texas', 28995881, 695662, 'Austin', 1),
+(3, 'Ontario', 14734014, 917741, 'Toronto', 2),
+(4, 'São Paulo', 46289333, 248209, 'São Paulo', 3),
+(5, 'Maharashtra', 114063427, 307713, 'Mumbai', 4),
+(6, 'Moscow Oblast', 7694989, 443562, 'Moscow', 5),
+(7, 'Beijing', 21542000, 16410, 'Beijing', 6),
+(8, 'New South Wales', 8160062, 800642, 'Sydney', 7),
+(9, 'Buenos Aires Province', 17700000, 307571, 'La Plata', 8),
+(10, 'Bavaria', 13076721, 70550, 'Munich', 9);
+
+SELECT * FROM Country
+SELECT * FROM State
+
+--1. Create a view that displays the top 5 countries with the highest population, along with their population figures.
+CREATE OR ALTER VIEW TOP_5_COUNTRIES_HIGHEST_POPULATION AS
+SELECT TOP 5 COUNTRY_NAME,POPULATION FROM COUNTRY
+ORDER BY POPULATION DESC --HIGHEST
+
+SELECT * FROM TOP_5_COUNTRIES_HIGHEST_POPULATION
+
+
+--2. Create a view that lists countries that do not have any states.
+CREATE OR ALTER VIEW STATE_NULL AS
+SELECT COUNTRY_NAME
+FROM COUNTRY C JOIN STATE S
+ON C.COUNTRY_ID=S.COUNTRY_ID
+WHERE S.STATE_ID IS NULL
+
+SELECT * FROM STATE_NULL
+
+--3. Create a view that displays the state with the highest population for each country, along with its population figure.
+CREATE OR ALTER VIEW STATE_HIGHEST_POPULATION AS 
+SELECT S.STATE_NAME,S.POPULATION FROM State S
+WHERE S.Population IN (SELECT MAX(Population) FROM State GROUP BY Country_ID)
+
+SELECT * FROM STATE_HIGHEST_POPULATION
+
+--4. Create a view that lists states that do not have a designated capital.
+CREATE OR ALTER VIEW STATES_WITHOUT_CAPITAL AS
+SELECT STATE_NAME
+FROM STATE
+WHERE CAPITAL IS NULL 
+
+SELECT * FROM STATES_WITHOUT_CAPITAL
+
+--5. Create a view that displays countries with more than one capital city.
+CREATE OR ALTER VIEW COUNTRIES_WITHMULTIPLE_CAPITALS AS
+SELECT COUNTRY_NAME
+FROM COUNTRY
+GROUP BY COUNTRY_NAME
+HAVING COUNT(DISTINCT CAPITAL) > 1;
+
+SELECT * FROM COUNTRIES_WITHMULTIPLE_CAPITALS
+
+
+
+	----PART–B------
+
+CREATE TABLE Customer36 (
+    CustomerID INT PRIMARY KEY,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(50) NOT NULL,
+    Phone NVARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY,
+    CustomerID INT NULL,
+    OrderDate DATE NOT NULL,
+    TotalAmount DECIMAL(10,2) NOT NULL,
+    CONSTRAINT FK_Orders_Customer
+        FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+
+
+INSERT INTO Customer36 VALUES
+(1, 'John', 'Doe', 'john.doe@example.com', '1234567890'),
+(2, 'Jane', 'Smith', 'jane.smith@example.com', '9876543210'),
+(3, 'Mike', 'Johnson', 'mike.johnson@example.com', '1112223333'),
+(4, 'Emily', 'Williams', 'emily.williams@example.com', '4445556666'),
+(5, 'David', 'Brown', 'david.brown@example.com', '7778889999');
+
+INSERT INTO Orders VALUES
+(1001, 1, '2023-07-01', 100.50),
+(1002, 1, '2023-07-02', 75.20),
+(1003, 3, '2023-07-03', 250.75),
+(1004, 4, '2023-07-04', 50.00),
+(1005, 5, '2023-07-05', 300.00);
+
+SELECT * FROM Customer36
+SELECT * FROM Orders
+
+-----------Part–B-------------------- 
+--1. Create a view AllOrdersView to Get All Orders with customer name. 
+CREATE OR ALTER VIEW ALL_ORDER_VIEW AS
+SELECT O.ORDERID,C.FIRSTNAME,C.LASTNAME
+FROM CUSTOMER36 C JOIN ORDERS O
+ON C.CUSTOMERID=O.CUSTOMERID
+
+SELECT * FROM ALL_ORDER_VIEW
+
+--2. Create a view to Get Customers with No Email Addresses. 
+CREATE OR ALTER VIEW NULL_EMAIL AS
+SELECT FIRSTNAME,LASTNAME FROM CUSTOMER36
+WHERE EMAIL IS NULL
+
+SELECT * FROM NULL_EMAIL	
+
+--3. Create a view to return sum of total amount of order as total_amount.
+CREATE OR ALTER VIEW SUM_TOTAL_AMOUNT AS
+SELECT SUM(TOTALAMOUNT) AS SUM_AMOUNT FROM ORDERS
+
+SELECT * FROM SUM_TOTAL_AMOUNT
+
+--4. Create a view to Get Customers with Their Total Order Amount. 
+CREATE OR ALTER VIEW TOTAL_ORDER_AMOUNT AS
+SELECT C.FIRSTNAME,C.LASTNAME,SUM(O.TOTALAMOUNT) AS SUM_TOTAL_AMOUNT
+FROM CUSTOMER36 C JOIN ORDERS O
+ON C.CUSTOMERID=O.CUSTOMERID
+GROUP BY C.FIRSTNAME,C.LASTNAME
+
+SELECT * FROM TOTAL_ORDER_AMOUNT
+--5. Create a view to Get Customers with Their Latest Order Date. 
+CREATE OR ALTER VIEW CUSTOMER_LATEST_DATE AS
+SELECT C.FIRSTNAME,C.LASTNAME,O.ORDERDATE
+FROM CUSTOMER36 C JOIN ORDERS O
+ON C.CUSTOMERID=O.CUSTOMERID
+GROUP BY C.FIRSTNAME,C.LASTNAME,O.ORDERDATE,C.CUSTOMERID
+
+SELECT * FROM CUSTOMER_LATEST_DATE
+
+-----------Part–C-------------------- 
+--6. Create a view to Get Customers with No Orders.
+CREATE OR ALTER VIEW ORDER_NULL AS
+SELECT C.FIRSTNAME,C.LASTNAME
+FROM CUSTOMER36 C LEFT JOIN ORDERS O
+ON C.CUSTOMERID=O.CUSTOMERID
+WHERE O.ORDERID IS NULL
+
+SELECT * FROM ORDER_NULL
+
+
+--7. Create a view to Get Customers with Their Total Number of Orders. 
+CREATE OR ALTER VIEW TOTAL_ORDER AS
+SELECT C.FIRSTNAME,C.LASTNAME,COUNT(O.ORDERID) AS TOTAL_ORDERS
+FROM CUSTOMER36 C JOIN ORDERS O
+ON C.CUSTOMERID=O.CUSTOMERID
+GROUP BY C.CUSTOMERID,C.FIRSTNAME,C.LASTNAME
+
+SELECT * FROM TOTAL_ORDER
+
+--8. Create a view to Get Customers with High-Value Orders. 
+CREATE OR ALTER  VIEW HIGH_VALUE_ORDER AS
+SELECT C.FirstName,C.LastName,C.CustomerID,O.OrderID,O.TotalAmount
+FROM CUSTOMER36 C JOIN ORDERS O
+ON C.CUSTOMERID=O.CUSTOMERID
+
+SELECT * FROM HIGH_VALUE_ORDER
+
+
+--9. Getting Customers with more than 1 order Placed. 
+CREATE OR ALTER VIEW ORDER_PLACED AS
+SELECT C.FIRSTNAME,C.LastName,O.ORDERID AS ORDER_PLACED
+FROM CUSTOMER36 C JOIN ORDERS O
+ON C.CUSTOMERID=O.CUSTOMERID
+GROUP BY C.FirstName,C.LastName,O.ORDERID
+HAVING COUNT(O.OrderID)>1
+
+SELECT * FROM ORDER_PLACED
+
+--10. Getting Customers with Orders in Date Range 2023-07-01 to 2023-07-04.
+CREATE OR ALTER VIEW DATA_RANGE AS
+SELECT C.FIRSTNAME ORDER 
+
+
